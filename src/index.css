@@ -1,0 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: 'Orbitron', sans-serif;
+  overflow: hidden; /* Блокируем скролл */
+}
+
+body, html, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* МАГИЯ ДЛЯ ВИДЕО */
+.hologram-video {
+  mix-blend-mode: screen; /* Черный станет прозрачным */
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Чтобы пацан влез */
+  z-index: 10;
+  position: relative;
+}
+
+/* ГЛИТЧ ЭФФЕКТ ДЛЯ ТЕКСТА */
+.neon-text {
+  text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 40px #ff00de;
+}
