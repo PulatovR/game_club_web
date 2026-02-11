@@ -79,7 +79,7 @@ const BackgroundParticles = memo(() => {
 function App() {
   const [started, setStarted] = useState(false);
   const [muted, setMuted] = useState(false);
-  const audioRef = useRef(new Audio('/audio/space.mp3'));
+  const audioRef = useRef(new Audio('audio/space.mp3'));
   
   const [text, setText] = useState('');
   const fullText = "Создаем новую игровую реальность...Спасибо за поддержку...и понимание...";
@@ -125,7 +125,7 @@ function App() {
             className="absolute bottom-0 left-0 w-full h-[65%] z-10 flex justify-center items-end pointer-events-none"
           >
             <video 
-              src="/video/room.webm" autoPlay loop muted playsInline
+              src="video/room.webm" autoPlay loop muted playsInline
               className="w-auto h-full object-contain"
               style={{ filter: 'drop-shadow(0 0 20px rgba(255, 215, 0, 0.5))' }}
             />
@@ -135,7 +135,7 @@ function App() {
 
       <div className="relative z-30 h-full flex flex-col items-center pointer-events-none">
         <motion.img 
-          src="/images/depo_logo.png" 
+          src="images/depo_logo.png" 
           initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           className="w-[min(70vw,300px)] mt-[10vh] drop-shadow-[0_0_25px_rgba(255,215,0,0.7)]"
         />
