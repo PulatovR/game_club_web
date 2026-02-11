@@ -16,7 +16,6 @@ const BackgroundParticles = memo(() => {
     interactivity: {
       events: {
         onHover: { enable: true, mode: "grab" },
-        // При клике "выплескиваем" новые частицы-иконки
         onClick: { enable: true, mode: "push" }, 
       },
       modes: {
@@ -44,25 +43,23 @@ const BackgroundParticles = memo(() => {
         value: 40,
       },
       opacity: { value: 0.4 },
-      // === МАГИЯ ИКОНОК ===
       shape: {
-        type: ["circle", "image"], // Смешиваем обычные точки и иконки
+        type: ["circle", "image"],
         options: {
           image: [
-            { src: "/icons/joystick.svg", width: 100, height: 100 },
-            { src: "/icons/mouse.svg", width: 100, height: 100 },
-            { src: "/icons/gamepad.svg", width: 100, height: 100 },
-            { src: "/icons/monitor.svg", width: 100, height: 100 }
+            { src: "icons/Joystick.svg", width: 100, height: 100 },
+            { src: "icons/Mouse.svg", width: 100, height: 100 },
+            { src: "icons/Gamepad.svg", width: 100, height: 100 },
+            { src: "icons/Monitor.svg", width: 100, height: 100 }
           ]
         }
       },
-      size: { value: { min: 2, max: 8 } }, // Иконки делаем чуть крупнее точек
-      
+      size: { value: { min: 2, max: 8 } },
       polygon: {
         enable: true,
         scale: 1,
         type: "outside", 
-        url: "/images/collision-mask.png",
+        url: "images/collision-mask.png",
         position: { x: 50, y: 55 },
         move: { radius: 10 },
         draw: { enable: false }
@@ -76,15 +73,28 @@ const BackgroundParticles = memo(() => {
   );
 });
 
+// ПЛЕЙЛИСТ
+const playlist = [
+  'audio/space.mp3', 
+  'audio/soft.mp3', 
+  'audio/horizon.mp3', 
+  'audio/relax.mp3',
+  'audio/drift.mp3'
+];
+
+// ТЕКСТ ДЛЯ ПЕЧАТИ (ВОССТАНОВЛЕНО)
+const fullText = "СОЗДАЕМ НОВУЮ ИГРОВУЮ РЕАЛЬНОСТЬ..."; 
+
 function App() {
   const [started, setStarted] = useState(false);
   const [muted, setMuted] = useState(false);
-  const audioRef = useRef(new Audio('audio/space.mp3'));
+  const [text, setText] = useState(''); // Сюда будет печататься текст
+  const [currentTrack, setCurrentTrack] = useState(0); 
   
-  const [text, setText] = useState('');
-  const fullText = "Создаем новую игровую реальность...Спасибо за поддержку...и понимание...";
+  const audioRef = useRef(new Audio(playlist[0]));
+  const typingAudioRef = useRef(new Audio('audio/click.mp3'));
 
-  // === НОВАЯ ЛОГИКА ТЕКСТА: БЕЗ СТИРАНИЯ ===
+  // 1. ЛОГИКА ПЕЧАТИ ТЕКСТА (ВОССТАНОВЛЕНО)
   useEffect(() => {
     if (!started) return;
     let i = 0;
@@ -93,24 +103,49 @@ function App() {
     const type = () => {
       if (i <= fullText.length) {
         setText(fullText.slice(0, i));
+        
+        // Звук клика клавиши
+        if (!muted && i < fullText.length) {
+          const click = typingAudioRef.current.cloneNode();
+          click.volume = 0.15;
+          click.play().catch(() => {});
+        }
+
         i++;
-        timer = setTimeout(type, 200);
+        timer = setTimeout(type, 200); 
       } else {
-        // Когда текст напечатан полностью — ждем 5 секунд и погнали заново
-        timer = setTimeout(() => {
-          i = 0;
-          type();
-        }, 5000);
+        // Пауза перед повтором
+        timer = setTimeout(() => { i = 0; type(); }, 5000);
       }
     };
 
     type();
     return () => clearTimeout(timer);
-  }, [started]);
+  }, [started, muted]);
+
+  // 2. Логика автоматического переключения треков
+  useEffect(() => {
+    const audio = audioRef.current;
+    const handleTrackEnd = () => {
+      const nextTrack = (currentTrack + 1) % playlist.length;
+      setCurrentTrack(nextTrack);
+    };
+    audio.addEventListener('ended', handleTrackEnd);
+    return () => audio.removeEventListener('ended', handleTrackEnd);
+  }, [currentTrack]);
+
+  // 3. Следим за сменой трека
+  useEffect(() => {
+    if (started) {
+      audioRef.current.src = playlist[currentTrack];
+      audioRef.current.volume = 0.4;
+      audioRef.current.play().catch(() => {});
+    }
+  }, [currentTrack, started]);
 
   const handleStart = () => {
     setStarted(true);
-    audioRef.current.loop = true;
+    audioRef.current.loop = false; // Чтобы работал переход на след. трек
     audioRef.current.play().catch(() => {});
   };
 
@@ -125,10 +160,14 @@ function App() {
             className="absolute bottom-0 left-0 w-full h-[65%] z-10 flex justify-center items-end pointer-events-none"
           >
             <video 
-              src="video/room.webm" autoPlay loop muted playsInline
-              className="w-auto h-full object-contain"
+              autoPlay loop muted playsInline 
+              className="w-full h-full object-contain"
               style={{ filter: 'drop-shadow(0 0 20px rgba(255, 215, 0, 0.5))' }}
-            />
+            >
+              <source src="video/room.webm" type="video/webm" />
+              <source src="video/room_ios.mov" type="video/quicktime" />
+              <img src="images/cyber-boy-gold.png" alt="DEPO Cyber Boy" />
+            </video>
           </motion.div>
         )}
       </AnimatePresence>
@@ -140,7 +179,6 @@ function App() {
           className="w-[min(70vw,300px)] mt-[10vh] drop-shadow-[0_0_25px_rgba(255,215,0,0.7)]"
         />
 
-        {/* === ПОДСВЕЧЕННЫЙ ТЕКСТ === */}
         {started && (
           <div style={{ 
             marginTop: '5vh',
@@ -150,7 +188,6 @@ function App() {
             textTransform: 'uppercase',
             letterSpacing: '0.2em',
             textAlign: 'center',
-            // Мощный неоновый эффект
             textShadow: '0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 40px rgba(255, 215, 0, 0.5)' 
           }}>
             {text}<span className="animate-pulse">|</span>
@@ -172,7 +209,7 @@ function App() {
       {started && (
         <button
           onClick={() => { audioRef.current.muted = !audioRef.current.muted; setMuted(!muted); }}
-          className="absolute top-6 right-6 p-4 border border-[#FFD700]/30 rounded-full text-[#FFD700] z-[100]"
+          className="absolute top-6 right-6 p-4 border border-[#FFD700]/30 rounded-full text-[#FFD700] z-[100] pointer-events-auto"
         >
           {muted ? <VolumeX size={24} /> : <Volume2 size={24} />}
         </button>
