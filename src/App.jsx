@@ -160,12 +160,12 @@ function App() {
             className="absolute bottom-0 left-0 w-full h-[65%] z-10 flex justify-center items-end pointer-events-none"
           >
             <video 
-              autoPlay loop muted playsInline 
+              autoPlay loop muted playsInline
+              preload="auto" 
               className="w-full h-full object-contain"
-              style={{ filter: 'drop-shadow(0 0 20px rgba(255, 215, 0, 0.5))' }}
-            >
+              style={{filter: 'drop-shadow(0 0 20px rgba(255, 215, 0, 0.5))',mixBlendMode: 'screen'}}
+            > <source src="video/room_ios.mov" type="video/quicktime" />
               <source src="video/room.webm" type="video/webm" />
-              <source src="video/room_ios.mov" type="video/quicktime" />
               <img src="images/cyber-boy-gold.png" alt="DEPO Cyber Boy" />
             </video>
           </motion.div>
